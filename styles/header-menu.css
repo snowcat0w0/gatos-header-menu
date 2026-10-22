@@ -1,0 +1,68 @@
+/* ⋮ toggle in the window header */
+.window-app .window-header .header-button.gatos-header-menu-toggle {
+  flex: 0 0 auto;
+  padding: 0 0.35rem;
+}
+.window-app .window-header .header-button.gatos-header-menu-toggle i { margin: 0; }
+
+/* Dropdown */
+.gatos-header-menu-dropdown {
+  position: fixed;
+  min-width: 12rem;
+  max-width: 22rem;
+  max-height: 70vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 0.25rem;
+  border-radius: 6px;
+  border: 1px solid var(--color-border-dark, #111);
+  background: var(--color-cool-5, #1f1f24);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.55);
+  font-family: var(--font-primary, sans-serif);
+}
+.gatos-header-menu-dropdown .gatos-header-menu-item {
+  all: unset;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: 100%;
+  padding: 0.35rem 0.6rem;
+  border-radius: 4px;
+  color: var(--color-text-light-highlight, #f0f0e0);
+  font-size: var(--font-size-13, 13px);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.gatos-header-menu-dropdown .gatos-header-menu-item i { width: 1.1rem; text-align: center; opacity: 0.85; }
+.gatos-header-menu-dropdown .gatos-header-menu-item span { overflow: hidden; text-overflow: ellipsis; }
+.gatos-header-menu-dropdown .gatos-header-menu-item:hover,
+.gatos-header-menu-dropdown .gatos-header-menu-item:focus-visible {
+  background: var(--color-warm-2, #6b2f1a);
+  outline: none;
+}
+.gatos-header-menu-dropdown .gatos-header-menu-config {
+  margin-top: 0.2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 0 0 4px 4px;
+  opacity: 0.8;
+}
+
+/* Configuration dialog */
+.gatos-header-menu-config .gatos-header-menu-config-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  max-height: 50vh;
+  overflow-y: auto;
+  margin: 0.4rem 0;
+}
+.gatos-header-menu-config .gatos-header-menu-row {
+  display: grid;
+  grid-template-columns: auto 1.2rem 1fr auto;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--font-size-13, 13px);
+}
+.gatos-header-menu-config .gatos-header-menu-row code { font-size: var(--font-size-11, 11px); opacity: 0.6; }

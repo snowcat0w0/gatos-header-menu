@@ -1,0 +1,44 @@
+{
+  "GATOSHM": {
+    "Menu": "More",
+    "MenuTooltip": "{n} more header buttons",
+    "Configure": "Choose visible buttons…",
+    "ConfigTitle": "Header Menu: visible buttons",
+    "ConfigMenuHint": "Pick which header buttons stay in the title bar; all others go into the ⋮ menu.",
+    "ConfigHint": "Checked buttons stay in the title bar. Everything else moves into the ⋮ menu. Buttons appear in this list once a sheet that has them has been opened. Buttons other modules inject directly into the page (such as Popout's) are never moved.",
+    "ConfigExtra": "Extra button classes to keep (comma separated)",
+    "Save": "Save",
+    "Scope": {
+      "actor": "Actor sheets",
+      "actorItem": "Actor and Item sheets",
+      "document": "All document sheets",
+      "all": "All V1 windows"
+    },
+    "Settings": {
+      "enabled": {
+        "Name": "Collapse header buttons",
+        "Hint": "Move header buttons that are not in the keep list into a ⋮ menu (this client only)."
+      },
+      "scope": {
+        "Name": "Windows affected",
+        "Hint": "Which Application V1 windows get the ⋮ menu. PF1 sheets are V1 windows."
+      },
+      "keep": {
+        "Name": "Buttons kept in the title bar",
+        "Hint": "Button CSS classes, comma separated. Use \"Choose visible buttons…\" for a checklist. Default: close, configure-token (Prototype Token). Buttons that modules inject straight into the page, such as Popout! and the taskbar's Tags, always stay where they are."
+      },
+      "iconOnly": {
+        "Name": "Icon-only kept buttons",
+        "Hint": "Show the kept buttons as icons with a tooltip to save even more space."
+      },
+      "showMenuLabel": {
+        "Name": "Show a label on the ⋮ button",
+        "Hint": "Display \"More\" next to the ⋮ icon."
+      },
+      "minHidden": {
+        "Name": "Collapse only from this many buttons",
+        "Hint": "Leave the header alone when fewer buttons than this would move into the menu."
+      }
+    }
+  }
+}

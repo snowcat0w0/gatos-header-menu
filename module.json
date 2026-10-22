@@ -1,0 +1,19 @@
+{
+  "id": "gatos-header-menu",
+  "title": "Gato's Header Menu",
+  "description": "Keeps sheet window headers tidy: only the buttons you choose (close, Popout, Prototype Token, ...) stay in the title bar, every other module button moves into a single ⋮ menu. Works with any system; made for crowded Pathfinder 1e sheets.",
+  "version": "0.1.0",
+  "authors": [{ "name": "jesun" }],
+  "compatibility": { "minimum": "12", "verified": "13", "maximum": "13" },
+  "relationships": {
+    "recommends": [
+      { "id": "lib-wrapper", "type": "module", "reason": "Wraps Application#_renderOuter cleanly alongside other modules." }
+    ]
+  },
+  "esmodules": ["scripts/module.js"],
+  "styles": ["styles/header-menu.css"],
+  "languages": [
+    { "lang": "en", "name": "English", "path": "lang/en.json" },
+    { "lang": "ko", "name": "한국어", "path": "lang/ko.json" }
+  ]
+}
