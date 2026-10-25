@@ -1,6 +1,6 @@
-# Gato's Header Menu — v0.1.0
+# Gato's Header Menu — v0.2.0
 
-Foundry VTT v12–v13. 시스템 무관(PF1 시트처럼 모듈 버튼이 많은 V1 창을 위해 제작).
+Foundry VTT v13. **요구 모듈**(0.2.0부터): [gatos-lib](../gatos-lib/README.md) — 설치·활성화 필요(비활성이면 ready에서 경고); 기능·API·설정 키·lang 키는 0.1.0과 같습니다. 시스템 무관(PF1 시트처럼 모듈 버튼이 많은 V1 창을 위해 제작).
 
 시트 제목 표시줄에는 고른 버튼만 남기고, 나머지 모듈 버튼은 전부 **⋮ 메뉴** 하나로 모읍니다.
 

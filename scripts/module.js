@@ -9,32 +9,30 @@
  * We wrap `_renderOuter` and, for the windows in scope, shadow `_getHeaderButtons` on the instance for that one
  * synchronous call: the final list is split into buttons that stay visible and buttons that move into one ⋮ menu.
  */
+import { csvList, defineModule, esc, formDialog, libActive, wrapMethod } from "./lib.js";
 
 const MODULE_ID = "gatos-header-menu";
 const MENU_CLASS = "gatos-header-menu-toggle";
 const DEFAULT_KEEP = ["close", "configure-token"];
 
+/** Library handle. No langPrefix: `L` localizes full keys (this module's and other modules' button labels). */
+const mod = defineModule(MODULE_ID, { settingsPrefix: "GATOSHM.Settings" });
+
 /** Last condensed list per app id, so the ⋮ button can find the hidden buttons and their handlers. */
 const hiddenByApp = new Map();
 
-const L = (k, d) => (d ? game.i18n.format(k, d) : game.i18n.localize(k));
+const L = mod.L;
 
 /* -------------------------------------------- */
 /*  Settings                                    */
 /* -------------------------------------------- */
 
 function keepList() {
-  const raw = game.settings.get(MODULE_ID, "keep") ?? "";
-  return raw.split(",").map((s) => s.trim()).filter(Boolean);
+  return csvList(mod.setting("keep") ?? "");
 }
 
-function setting(key) {
-  try {
-    return game.settings.get(MODULE_ID, key);
-  } catch {
-    return undefined;
-  }
-}
+/** `undefined` (instead of a throw) while a key is not registered yet — gatos-lib mod.setting. */
+const setting = (key) => mod.setting(key);
 
 /** Remember every button class we have seen, so the configuration dialog can list them. */
 async function rememberButtons(buttons) {
@@ -48,7 +46,7 @@ async function rememberButtons(buttons) {
       changed = true;
     }
   }
-  if (changed) await game.settings.set(MODULE_ID, "known", known);
+  if (changed) await mod.setSetting("known", known);
 }
 
 /* -------------------------------------------- */
@@ -73,7 +71,7 @@ function appliesTo(app) {
 
 function condense(app, buttons) {
   if (!Array.isArray(buttons) || buttons.length === 0) return buttons;
-  rememberButtons(buttons).catch((err) => console.warn(`${MODULE_ID} | could not store known buttons`, err));
+  rememberButtons(buttons).catch((err) => mod.warn("could not store known buttons", err));
 
   const keep = new Set(keepList());
   const visible = [];
@@ -146,7 +144,7 @@ function openMenu(app, event) {
       try {
         b.onclick?.call(app, ev);
       } catch (err) {
-        console.error(`${MODULE_ID} | header button "${b.class}" failed`, err);
+        mod.error(`header button "${b.class}" failed`, err);
       }
     });
     el.append(item);
@@ -199,37 +197,40 @@ async function openConfig() {
     .sort((a, b) => L(a[1].label).localeCompare(L(b[1].label)))
     .map(([cls, info]) => `
       <label class="gatos-header-menu-row">
-        <input type="checkbox" name="keep" value="${foundry.utils.escapeHTML(cls)}" ${keep.has(cls) ? "checked" : ""}>
-        <i class="${foundry.utils.escapeHTML(info.icon || "fa-solid fa-circle")}"></i>
-        <span class="label">${foundry.utils.escapeHTML(L(info.label) || cls)}</span>
-        <code>${foundry.utils.escapeHTML(cls)}</code>
+        <input type="checkbox" name="keep" value="${esc(cls)}" ${keep.has(cls) ? "checked" : ""}>
+        <i class="${esc(info.icon || "fa-solid fa-circle")}"></i>
+        <span class="label">${esc(L(info.label) || cls)}</span>
+        <code>${esc(cls)}</code>
       </label>`).join("");
   const content = `
     <p class="hint">${L("GATOSHM.ConfigHint")}</p>
     <div class="gatos-header-menu-config-list">${rows}</div>
     <div class="form-group">
       <label>${L("GATOSHM.ConfigExtra")}</label>
-      <input type="text" name="extra" value="${foundry.utils.escapeHTML([...keep].filter((k) => !known[k]).join(", "))}" placeholder="my-module-button">
+      <input type="text" name="extra" value="${esc([...keep].filter((k) => !known[k]).join(", "))}" placeholder="my-module-button">
     </div>`;
-  const result = await foundry.applications.api.DialogV2.prompt({
-    window: { title: L("GATOSHM.ConfigTitle"), icon: "fa-solid fa-ellipsis-vertical" },
+  // gatos-lib formDialog with the 0.1.0 markup (prompt: Save only, no Cancel button): Save reads the checked
+  // classes + the CSV field; close → null.
+  const result = await formDialog({
+    cancel: false,
+    title: L("GATOSHM.ConfigTitle"),
+    icon: "fa-solid fa-ellipsis-vertical",
     classes: ["gatos-header-menu-config"],
-    position: { width: 460 },
+    width: 460,
     content,
     ok: {
       label: L("GATOSHM.Save"),
       icon: "fa-solid fa-floppy-disk",
-      callback: (_ev, button) => {
+      read: (button) => {
         const form = button.form;
         const checked = [...form.querySelectorAll("input[name=keep]:checked")].map((i) => i.value);
-        const extra = (form.querySelector("input[name=extra]")?.value ?? "").split(",").map((s) => s.trim()).filter(Boolean);
+        const extra = csvList(form.querySelector("input[name=extra]")?.value ?? "");
         return [...new Set([...checked, ...extra])];
       },
     },
-    rejectClose: false,
   });
   if (!Array.isArray(result)) return;
-  await game.settings.set(MODULE_ID, "keep", result.join(", "));
+  await mod.setSetting("keep", result.join(", "));
   rerenderOpenWindows();
 }
 
@@ -246,7 +247,7 @@ function rerenderOpenWindows() {
     try {
       refreshHeader(app);
     } catch (err) {
-      console.warn(`${MODULE_ID} | could not refresh header of`, app, err);
+      mod.warn("could not refresh header of", app, err);
     }
   }
 }
@@ -310,7 +311,7 @@ function renderOuterWrapper(wrapped, ...args) {
     try {
       return condense(app, buttons);
     } catch (err) {
-      console.error(`${MODULE_ID} | could not condense header buttons`, err);
+      mod.error("could not condense header buttons", err);
       return buttons;
     }
   };
@@ -322,17 +323,16 @@ function renderOuterWrapper(wrapped, ...args) {
   }
 }
 
+/**
+ * gatos-lib wrapMethod: libWrapper when active, else a plain prototype wrapper. libWrapper only accepts a
+ * package id matching the calling file, so the register/unregister calls stay here (0.1.0 behaviour: the
+ * wrapper is listed under gatos-header-menu).
+ */
 function installWrapper() {
-  const target = "foundry.appv1.api.Application.prototype._renderOuter";
-  if (game.modules.get("lib-wrapper")?.active && globalThis.libWrapper) {
-    libWrapper.register(MODULE_ID, target, renderOuterWrapper, "WRAPPER");
-    return;
-  }
-  const proto = foundry.appv1?.api?.Application?.prototype ?? globalThis.Application?.prototype;
-  const original = proto._renderOuter;
-  proto._renderOuter = function (...args) {
-    return renderOuterWrapper.call(this, original.bind(this), ...args);
-  };
+  wrapMethod(mod, "foundry.appv1.api.Application.prototype._renderOuter", renderOuterWrapper, "WRAPPER", {
+    register: (target, fn, type) => libWrapper.register(MODULE_ID, target, fn, type),
+    unregister: (id) => libWrapper.unregister(MODULE_ID, id, false),
+  });
 }
 
 /* -------------------------------------------- */
@@ -340,34 +340,41 @@ function installWrapper() {
 /* -------------------------------------------- */
 
 Hooks.once("init", () => {
-  const reg = (key, data) => game.settings.register(MODULE_ID, key, {
-    name: `GATOSHM.Settings.${key}.Name`, hint: `GATOSHM.Settings.${key}.Hint`, config: true, ...data,
-  });
-  reg("enabled", { scope: "client", type: Boolean, default: true, onChange: rerenderOpenWindows });
-  reg("scope", {
-    scope: "world", type: String, default: "actorItem", onChange: rerenderOpenWindows,
-    choices: {
-      actor: "GATOSHM.Scope.actor",
-      actorItem: "GATOSHM.Scope.actorItem",
-      document: "GATOSHM.Scope.document",
-      all: "GATOSHM.Scope.all",
+  // Installed-but-disabled library = "half state" (gatos-lib PLAN §5.6): code imports fine, but the library's
+  // lang/css/api are missing. Foundry blocks activation when the library is missing entirely (relationships.requires).
+  if (!libActive()) {
+    Hooks.once("ready", () =>
+      ui.notifications.error("Gato's Header Menu: gatos-lib 모듈을 활성화해야 합니다. / Enable the gatos-lib module.", { permanent: true }),
+    );
+  }
+  // Lang keys as in 0.1.0: GATOSHM.Settings.<key>.Name/.Hint with the raw camelCase key.
+  mod.registerSettings({
+    enabled: { scope: "client", type: Boolean, default: true, onChange: rerenderOpenWindows },
+    scope: {
+      scope: "world", type: String, default: "actorItem", onChange: rerenderOpenWindows,
+      choices: {
+        actor: "GATOSHM.Scope.actor",
+        actorItem: "GATOSHM.Scope.actorItem",
+        document: "GATOSHM.Scope.document",
+        all: "GATOSHM.Scope.all",
+      },
     },
-  });
-  reg("keep", { scope: "world", type: String, default: DEFAULT_KEEP.join(", "), onChange: rerenderOpenWindows });
-  reg("iconOnly", { scope: "client", type: Boolean, default: false, onChange: rerenderOpenWindows });
-  reg("showMenuLabel", { scope: "client", type: Boolean, default: false, onChange: rerenderOpenWindows });
-  reg("minHidden", { scope: "world", type: Number, default: 1, range: { min: 1, max: 5, step: 1 }, onChange: rerenderOpenWindows });
-  game.settings.register(MODULE_ID, "known", { scope: "client", config: false, type: Object, default: {} });
-  game.settings.registerMenu(MODULE_ID, "configure", {
-    name: "GATOSHM.ConfigTitle", label: "GATOSHM.Configure", hint: "GATOSHM.ConfigMenuHint",
-    icon: "fa-solid fa-sliders", type: HeaderMenuConfig, restricted: true,
-  });
+    keep: { scope: "world", type: String, default: DEFAULT_KEEP.join(", "), onChange: rerenderOpenWindows },
+    iconOnly: { scope: "client", type: Boolean, default: false, onChange: rerenderOpenWindows },
+    showMenuLabel: { scope: "client", type: Boolean, default: false, onChange: rerenderOpenWindows },
+    minHidden: { scope: "world", type: Number, default: 1, range: { min: 1, max: 5, step: 1 }, onChange: rerenderOpenWindows },
+    known: { hidden: true, scope: "client", type: Object, default: {} },
+    configure: {
+      menu: { icon: "fa-solid fa-sliders", type: HeaderMenuConfig, restricted: true },
+      nameKey: "GATOSHM.ConfigTitle", labelKey: "GATOSHM.Configure", hintKey: "GATOSHM.ConfigMenuHint",
+    },
+  }, { keyStyle: "raw" });
 });
 
 Hooks.once("setup", installWrapper);
 
 Hooks.once("ready", () => {
-  game.modules.get(MODULE_ID).api = { openConfig, keepList, hiddenFor: (app) => hiddenByApp.get(app.appId) ?? [] };
+  mod.exposeApi({ openConfig, keepList, hiddenFor: (app) => hiddenByApp.get(app.appId) ?? [] });
 });
 
 Hooks.on("closeApplication", (app) => {
