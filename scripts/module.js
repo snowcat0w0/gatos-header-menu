@@ -1,7 +1,7 @@
 /**
  * Gato's Header Menu
  *
- * Application V1 windows (all PF1 sheets in Foundry v13) build their title-bar buttons in `_getHeaderButtons()`:
+ * Application V1 windows (e.g. PF1 sheets in Foundry v13/v14) build their title-bar buttons in `_getHeaderButtons()`:
  * the base class adds "Close" and fires the `get<Class>HeaderButtons` hooks, then subclasses such as ActorSheet
  * add more (Prototype Token). `_renderOuter()` calls it once, synchronously, before its first await, and binds
  * click handlers by matching the button `class`.

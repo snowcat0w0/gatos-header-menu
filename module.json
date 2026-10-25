@@ -2,12 +2,12 @@
   "id": "gatos-header-menu",
   "title": "Gato's Header Menu",
   "description": "Collapses Application V1 window header buttons (PF1 sheets and others) into a single ⋮ menu, keeping only the buttons you choose in the title bar.",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "authors": [{ "name": "jesun" }],
-  "compatibility": { "minimum": "13", "verified": "13" },
+  "compatibility": { "minimum": "14", "verified": "14" },
   "relationships": {
     "requires": [
-      { "id": "gatos-lib", "type": "module", "compatibility": { "minimum": "1.0.0-alpha.1" } }
+      { "id": "gatos-lib", "type": "module", "compatibility": { "minimum": "1.1.0-alpha.1" } }
     ],
     "recommends": [
       { "id": "lib-wrapper", "type": "module", "reason": "Wraps Application#_renderOuter cleanly alongside other modules." }
