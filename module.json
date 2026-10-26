@@ -3,20 +3,53 @@
   "title": "Gato's Header Menu",
   "description": "Collapses Application V1 window header buttons (PF1 sheets and others) into a single ⋮ menu, keeping only the buttons you choose in the title bar.",
   "version": "0.3.0",
-  "authors": [{ "name": "jesun" }],
-  "compatibility": { "minimum": "14", "verified": "14" },
+  "authors": [
+    {
+      "name": "jesun"
+    }
+  ],
+  "url": "https://github.com/snowcat0w0/gatos-header-menu",
+  "manifest": "https://raw.githubusercontent.com/snowcat0w0/gatos-header-menu/foundry-v14/module.json",
+  "download": "https://github.com/snowcat0w0/gatos-header-menu/releases/download/v0.3.0/gatos-header-menu.zip",
+  "compatibility": {
+    "minimum": "14",
+    "verified": "14"
+  },
   "relationships": {
     "requires": [
-      { "id": "gatos-lib", "type": "module", "compatibility": { "minimum": "1.1.0-alpha.1" } }
+      {
+        "id": "gatos-lib",
+        "type": "module",
+        "compatibility": {
+          "minimum": "1.1.0-alpha.1"
+        },
+        "manifest": "https://raw.githubusercontent.com/snowcat0w0/gatos-lib/foundry-v14/module.json"
+      }
     ],
     "recommends": [
-      { "id": "lib-wrapper", "type": "module", "reason": "Wraps Application#_renderOuter cleanly alongside other modules." }
+      {
+        "id": "lib-wrapper",
+        "type": "module",
+        "reason": "Wraps Application#_renderOuter cleanly alongside other modules."
+      }
     ]
   },
-  "esmodules": ["scripts/module.js"],
-  "styles": ["styles/header-menu.css"],
+  "esmodules": [
+    "scripts/module.js"
+  ],
+  "styles": [
+    "styles/header-menu.css"
+  ],
   "languages": [
-    { "lang": "en", "name": "English", "path": "lang/en.json" },
-    { "lang": "ko", "name": "한국어", "path": "lang/ko.json" }
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    },
+    {
+      "lang": "ko",
+      "name": "한국어",
+      "path": "lang/ko.json"
+    }
   ]
 }
